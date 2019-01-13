@@ -42,7 +42,7 @@ const usuario = obterUsuario(function resolverUsuario(error, usuario){
     obterEndereco(usuario.id, function resolverEndereco(error2, endereco){
       if(error2) {
         console.log("DEU RUIM em ENDERECO", error);
-        return;  
+        return;
       }
       console.log(`
         Nome: ${usuario.nome},
@@ -52,3 +52,4 @@ const usuario = obterUsuario(function resolverUsuario(error, usuario){
     })
   })
 })
+
