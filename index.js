@@ -3,22 +3,34 @@
     1 Obter o numero de telefone a partir do id 
     2 Obter o endereço do usuário a partir do id
 */
-function obterUsuario(callback) {
-  setTimeout(function () {
-    return callback(null, {
-      id: 1,
-      nome: 'Alladin',
-      dataNascimente: new Date(),
-    })
-  }, 1000)
+//importamos um módulo interno do node.js
+const util = require('util')
+const obterEnderecoAsync = util.promisify(obterEndereco)
+function obterUsuario() {
+  //quando der algum problema --> Reject(ERRO)
+  //quando tudo der certo --> RESOLVE
+  return new Promise(function resolvePromise(resolve, reject){
+    setTimeout(function () {
+      /* return reject(new Error('Deu ruim de verdade!')) */
+      return resolve({
+        id: 1,
+        nome: 'Alladin',
+        dataNascimente: new Date(),
+      })
+    }, 1000)
+  })
+  
 }
-function obterTelefone(idUsuario, callback) {
-  setTimeout(() => {
-    return callback(null, {
-      telefone: '1199002',
-      ddd: 11
-    })
-  }, 2000)
+function obterTelefone(idUsuario) {
+  return new Promise(function resolverPromise(resolve, reject){
+    setTimeout(() => {
+      return resolve({
+        telefone: '1199002',
+        ddd: 11
+      })
+    }, 2000)
+  })
+  
 }
 function obterEndereco(idUsuario, callback) {
   setTimeout(() => {
@@ -29,7 +41,46 @@ function obterEndereco(idUsuario, callback) {
   }, 2000)
 }
 
-const usuario = obterUsuario(function resolverUsuario(error, usuario){
+const usuarioPromise = obterUsuario()
+//Para manipular o sucesso, usamos a função .then()
+//Para manipular o erros, usamos a função .catch()
+
+usuarioPromise
+  .then(function(usuario){
+    return obterTelefone(usuario.id)
+      .then(function resolverTelefone(result){
+        return {
+          usuario: {
+            nome: usuario.nome,
+            id: usuario.id
+          },
+          telefone: result
+        }
+      })
+  })
+  .then(function(resultado){
+    return obterEnderecoAsync(resultado.usuario.id)
+      .then(function resolverEndereco(result){
+        return {
+          usuario: resultado.usuario,
+          telefone: resultado.telefone,
+          endereco: result
+        }
+      })
+      
+  })
+  .then(function(resultado){
+    console.log(`
+      Nome: ${resultado.usuario.nome}
+      Endereco: ${resultado.endereco.rua}, ${resultado.endereco.numero}
+      Telefone: (${resultado.telefone.ddd}) ${resultado.telefone.telefone} 
+    `)
+  })
+  .catch(function(error){
+    console.log('Deu ruim!', error)   
+  })
+
+/* obterUsuario(function resolverUsuario(error, usuario){
   if(error) {
     console.log("DEU RUIM em USUÁRIO", error);
     return;  
@@ -51,5 +102,4 @@ const usuario = obterUsuario(function resolverUsuario(error, usuario){
       `);
     })
   })
-})
-
+})*/
