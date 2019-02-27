@@ -37,7 +37,7 @@ class Postgres extends ICrud{
 }
 
 //Implementando a interface
-class ContextStrategys{
+class ContextStrategy{
   constructor(strategy) {
     this._database = strategy
   }
@@ -55,3 +55,9 @@ class ContextStrategys{
     return this._database.delete(id)
   }
 }
+
+const contextMongo = new ContextStrategy(new MongoDB())
+contextMongo.create({'foo':'bar'})
+
+const contextPostgres = new ContextStrategy(new Postgres())
+contextPostgres.create()
